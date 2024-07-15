@@ -1,0 +1,25 @@
+#include <avr/io.h>
+#include <util/delay.h>
+
+int main(void) {
+    
+    uint16_t duty_cycle = 0;
+    DDRB |= 0x02;  // PTB1 is for OC1B output
+    TCCR1A |= 0x23;  // Fast PWM mode, clear OC1B compare match, OCR1A as TOP (0b00100011)
+    TCCR1B |= 0x19;  // Fast PWM mode, no prescaler (0b00011001)
+
+    OCR1A = 1599; // TOP = 16MHz/(10kHz * 1) - 1 = 1599
+    OCR1B = 0; // // Initial duty cycle set to 0%
+
+    while (1) {
+        _delay_ms(1);
+
+        if (duty_cycle < 100) { // Increment duty cycle
+            duty_cycle++;
+            OCR1B = (uint16_t)(duty_cycle * OCR1A / 100 ); // Calculate duty cycle
+        } 
+    }
+}
+
+
+
